@@ -13,6 +13,7 @@
 html,
 body {
   height: 100vh;
-  font-family: "Poppins";
+  font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 </style>

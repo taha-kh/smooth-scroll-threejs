@@ -165,7 +165,8 @@ export default class HelloWorld extends Vue {
   h1 {
     font-size: 5em;
     color: #ab6554;
-    // margin-left: 10vw;
+    text-transform: uppercase;
+    font-weight: 200;
   }
 }
 </style>
