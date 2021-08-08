@@ -15,16 +15,85 @@ import gsap from "gsap";
 // import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 // import * as dat from "dat.gui";
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 @Component
 export default class HelloWorld extends Vue {
+  scene!: THREE.Scene;
+  camera!: THREE.PerspectiveCamera;
+  renderer!: THREE.WebGLRenderer;
+
+  sizes = {
+    width: window.innerWidth,
+    height: window.innerHeight,
+  };
+
   mounted(): void {
-    const textureLoader = new THREE.TextureLoader();
+    this.scene = new THREE.Scene();
+    this.loadCamera();
+    this.loadImage();
+    this.renderWebGL();
 
-    const canvas = this.$refs.webgl as HTMLCanvasElement;
+    const mouse = new THREE.Vector2();
+    window.addEventListener("mousemove", (event) => {
+      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    });
 
-    const scene = new THREE.Scene();
+    let y = 0;
+    let position = 0;
 
+    window.addEventListener("wheel", (event) => {
+      y = event.deltaY * 0.0007;
+    });
+
+    const raycaster = new THREE.Raycaster();
+
+    const tick = () => {
+      position += y;
+      y *= 0.9;
+
+      raycaster.setFromCamera(mouse, this.camera);
+      const intersects = raycaster.intersectObjects(this.getImagesFromScene());
+
+      for (const intersect of intersects) {
+        gsap.to(intersect.object.scale, { x: 1.7, y: 1.7 });
+        gsap.to(intersect.object.rotation, { y: -0.5 });
+        gsap.to(intersect.object.position, { z: -0.9 });
+      }
+
+      for (const object of this.getImagesFromScene()) {
+        if (!intersects.find((i) => i.object === object)) {
+          gsap.to(object.scale, { x: 1, y: 1 });
+          gsap.to(object.rotation, { y: 0 });
+          gsap.to(object.position, { z: 0 });
+        }
+      }
+
+      this.camera.position.y = -position;
+
+      this.renderer.render(this.scene, this.camera);
+      window.requestAnimationFrame(tick);
+    };
+
+    tick();
+  }
+
+  private loadCamera(): void {
+    this.camera = new THREE.PerspectiveCamera(
+      75,
+      this.sizes.width / this.sizes.height,
+      0.1,
+      100
+    );
+    this.camera.position.x = 0;
+    this.camera.position.y = 0;
+    this.camera.position.z = 2;
+    this.scene.add(this.camera);
+  }
+
+  private loadImage(): void {
     const geometry = new THREE.PlaneBufferGeometry(1, 1.3);
+    const textureLoader = new THREE.TextureLoader();
 
     for (let index = 0; index < 5; index++) {
       const material = new THREE.MeshBasicMaterial({
@@ -34,101 +103,44 @@ export default class HelloWorld extends Vue {
       const img = new THREE.Mesh(geometry, material);
       img.position.set(1, index * -1.8, 0);
 
-      scene.add(img);
+      this.scene.add(img);
     }
+  }
 
-    let objs: any = [];
-    scene.traverse((object: any) => {
+  private renderWebGL(): void {
+    const canvas = this.$refs.webgl as HTMLCanvasElement;
+
+    this.renderer = new THREE.WebGLRenderer({
+      canvas: canvas,
+    });
+
+    this.renderer.setSize(this.sizes.width, this.sizes.height);
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    window.addEventListener("resize", this.onResizeWindow);
+  }
+
+  private onResizeWindow(): void {
+    // Update sizes
+    this.sizes.width = window.innerWidth;
+    this.sizes.height = window.innerHeight;
+
+    // Update camera
+    this.camera.aspect = this.sizes.width / this.sizes.height;
+    this.camera.updateProjectionMatrix();
+
+    // Update renderer
+    this.renderer.setSize(this.sizes.width, this.sizes.height);
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  }
+
+  private getImagesFromScene(): THREE.Object3D[] {
+    let objs: THREE.Object3D[] = [];
+    this.scene.traverse((object: any) => {
       if (object.isMesh) objs.push(object);
     });
 
-    console.log(objs);
-
-    const pointLight = new THREE.PointLight(0xffffff, 0.1);
-    pointLight.position.x = 2;
-    pointLight.position.y = 3;
-    pointLight.position.z = 4;
-    scene.add(pointLight);
-
-    const sizes = {
-      width: window.innerWidth,
-      height: window.innerHeight,
-    };
-
-    window.addEventListener("resize", () => {
-      // Update sizes
-      sizes.width = window.innerWidth;
-      sizes.height = window.innerHeight;
-
-      // Update camera
-      camera.aspect = sizes.width / sizes.height;
-      camera.updateProjectionMatrix();
-
-      // Update renderer
-      renderer.setSize(sizes.width, sizes.height);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    });
-
-    const camera = new THREE.PerspectiveCamera(
-      75,
-      sizes.width / sizes.height,
-      0.1,
-      100
-    );
-    camera.position.x = 0;
-    camera.position.y = 0;
-    camera.position.z = 2;
-    scene.add(camera);
-
-    const renderer = new THREE.WebGLRenderer({
-      canvas: canvas,
-    });
-    renderer.setSize(sizes.width, sizes.height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-    const mouse = new THREE.Vector2();
-    window.addEventListener("mousemove", (event) => {
-      mouse.x = (event.clientX / sizes.width) * 2 - 1;
-      mouse.y = (event.clientY / sizes.height) * 2 - 1;
-    });
-
-    // Mouse position
-    let y = 0;
-    let position = 0;
-    window.addEventListener("wheel", (event) => {
-      y = -event.deltaY * 0.0007;
-    });
-
-    const raycaster = new THREE.Raycaster();
-
-    const tick = () => {
-      position += y;
-      y *= 0.9;
-
-      raycaster.setFromCamera(mouse, camera);
-      const intersects = raycaster.intersectObjects(objs);
-
-      for (const intersect of intersects) {
-        gsap.to(intersect.object.scale, { x: 1.7, y: 1.7 });
-        gsap.to(intersect.object.rotation, { y: -0.5 });
-        gsap.to(intersect.object.position, { z: -0.9 });
-      }
-
-      for (const object of objs) {
-        if (!intersects.find((i) => i.object === object)) {
-          gsap.to(object.scale, { x: 1, y: 1 });
-          gsap.to(object.rotation, { y: 0 });
-          gsap.to(object.position, { z: 0 });
-        }
-      }
-
-      camera.position.y = -position;
-
-      renderer.render(scene, camera);
-      window.requestAnimationFrame(tick);
-    };
-
-    tick();
+    return objs;
   }
 }
 </script>
