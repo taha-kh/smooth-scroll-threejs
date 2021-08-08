@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="content">
-      <h1>The art from artists</h1>
+      <h1>{{ albumTitle }}</h1>
     </div>
 
     <canvas ref="webgl" class="webgl"></canvas>
@@ -21,15 +21,83 @@ export default class HelloWorld extends Vue {
   scene!: THREE.Scene;
   camera!: THREE.PerspectiveCamera;
   renderer!: THREE.WebGLRenderer;
+  textureLoader: THREE.TextureLoader;
+
+  albumTitle: string | undefined;
 
   sizes = {
     width: window.innerWidth,
     height: window.innerHeight,
   };
 
+  albums = [
+    {
+      id: "0",
+      name: "The Piper at the Gates of Dawn",
+    },
+    {
+      id: "1",
+      name: "A Saucerful of Secrets",
+    },
+    {
+      id: "2",
+      name: "More",
+    },
+    {
+      id: "3",
+      name: "Ummagumma",
+    },
+    {
+      id: "4",
+      name: "Atom Heart Mother",
+    },
+    {
+      id: "5",
+      name: "Meddle",
+    },
+    {
+      id: "6",
+      name: "Obscured by Clouds",
+    },
+    {
+      id: "7",
+      name: "The Dark Side of the Moon",
+    },
+    {
+      id: "8",
+      name: "Wish You Were Here",
+    },
+    {
+      id: "9",
+      name: "Animals",
+    },
+    {
+      id: "10",
+      name: "The Wall",
+    },
+    {
+      id: "11",
+      name: "The Final Cut",
+    },
+    {
+      id: "12",
+      name: "A Momentary Lapse of Reason",
+    },
+    {
+      id: "13",
+      name: "The Division Bell",
+    },
+  ];
+
+  constructor() {
+    super();
+    this.textureLoader = new THREE.TextureLoader();
+    this.albumTitle = "";
+  }
+
   mounted(): void {
     this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color("#e0d7bc");
+    // this.scene.background = this.textureLoader.load("./sky.jpg");
     this.loadCamera();
     this.loadImage();
     this.renderWebGL();
@@ -61,6 +129,9 @@ export default class HelloWorld extends Vue {
         gsap.to(intersect.object.scale, { x: 1.7, y: 1.7 });
         // gsap.to(intersect.object.rotation, { y: -0.5 });
         // gsap.to(intersect.object.position, { z: -0.9 });
+        this.albumTitle = this.albums.find(
+          (album) => album.id === intersect.object.name
+        )?.name;
       }
 
       for (const object of this.getImagesFromScene()) {
@@ -94,16 +165,16 @@ export default class HelloWorld extends Vue {
   }
 
   private loadImage(): void {
-    const geometry = new THREE.PlaneBufferGeometry(1, 1.3);
-    const textureLoader = new THREE.TextureLoader();
+    const geometry = new THREE.PlaneBufferGeometry(1, 1);
 
-    for (let index = 0; index < 8; index++) {
+    for (let index = 0; index < 14; index++) {
       const material = new THREE.MeshBasicMaterial({
-        map: textureLoader.load(`./${index}.jpg`),
+        map: this.textureLoader.load(`./${index}.jpg`),
       });
 
       const img = new THREE.Mesh(geometry, material);
-      img.position.set(index * 1.8, 0, 0);
+      img.position.set(index * 1.5, 0, 0);
+      img.name = index.toString();
 
       this.scene.add(img);
     }
@@ -163,8 +234,8 @@ export default class HelloWorld extends Vue {
   text-align: center;
 
   h1 {
-    font-size: 5em;
-    color: #ab6554;
+    font-size: 3em;
+    color: white;
     text-transform: uppercase;
     font-weight: 200;
   }
