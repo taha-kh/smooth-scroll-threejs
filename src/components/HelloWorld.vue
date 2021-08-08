@@ -29,6 +29,7 @@ export default class HelloWorld extends Vue {
 
   mounted(): void {
     this.scene = new THREE.Scene();
+    this.scene.background = new THREE.Color("#e0d7bc");
     this.loadCamera();
     this.loadImage();
     this.renderWebGL();
@@ -39,37 +40,38 @@ export default class HelloWorld extends Vue {
       mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
     });
 
-    let y = 0;
+    let x = 0;
     let position = 0;
 
     window.addEventListener("wheel", (event) => {
-      y = event.deltaY * 0.0007;
+      x = event.deltaY * 0.0007;
+      console.log(x);
     });
 
     const raycaster = new THREE.Raycaster();
 
     const tick = () => {
-      position += y;
-      y *= 0.9;
+      position += x;
+      x *= 0.9;
 
       raycaster.setFromCamera(mouse, this.camera);
       const intersects = raycaster.intersectObjects(this.getImagesFromScene());
 
       for (const intersect of intersects) {
         gsap.to(intersect.object.scale, { x: 1.7, y: 1.7 });
-        gsap.to(intersect.object.rotation, { y: -0.5 });
-        gsap.to(intersect.object.position, { z: -0.9 });
+        // gsap.to(intersect.object.rotation, { y: -0.5 });
+        // gsap.to(intersect.object.position, { z: -0.9 });
       }
 
       for (const object of this.getImagesFromScene()) {
         if (!intersects.find((i) => i.object === object)) {
           gsap.to(object.scale, { x: 1, y: 1 });
-          gsap.to(object.rotation, { y: 0 });
-          gsap.to(object.position, { z: 0 });
+          // gsap.to(object.rotation, { y: 0 });
+          // gsap.to(object.position, { z: 0 });
         }
       }
 
-      this.camera.position.y = -position;
+      this.camera.position.x = -position;
 
       this.renderer.render(this.scene, this.camera);
       window.requestAnimationFrame(tick);
@@ -95,13 +97,13 @@ export default class HelloWorld extends Vue {
     const geometry = new THREE.PlaneBufferGeometry(1, 1.3);
     const textureLoader = new THREE.TextureLoader();
 
-    for (let index = 0; index < 5; index++) {
+    for (let index = 0; index < 8; index++) {
       const material = new THREE.MeshBasicMaterial({
         map: textureLoader.load(`./${index}.jpg`),
       });
 
       const img = new THREE.Mesh(geometry, material);
-      img.position.set(1, index * -1.8, 0);
+      img.position.set(index * 1.8, 0, 0);
 
       this.scene.add(img);
     }
@@ -157,13 +159,13 @@ export default class HelloWorld extends Vue {
   display: grid;
   align-items: center;
   z-index: 1;
-  height: 100%;
   width: 100%;
+  text-align: center;
 
   h1 {
     font-size: 5em;
-    color: white;
-    margin-left: 10vw;
+    color: #ab6554;
+    // margin-left: 10vw;
   }
 }
 </style>
