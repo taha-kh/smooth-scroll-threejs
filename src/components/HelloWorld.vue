@@ -1,33 +1,48 @@
 <template>
-  <canvas ref="webgl" class="webgl"></canvas>
+  <div>
+    <div class="content">
+      <h1>The art from artists</h1>
+    </div>
+
+    <canvas ref="webgl" class="webgl"></canvas>
+  </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import * as THREE from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import gsap from "gsap";
+// import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+// import * as dat from "dat.gui";
 
 @Component
 export default class HelloWorld extends Vue {
   mounted(): void {
-    // Canvas
+    const textureLoader = new THREE.TextureLoader();
+
     const canvas = this.$refs.webgl as HTMLCanvasElement;
 
-    // Scene
     const scene = new THREE.Scene();
 
-    // Objects
-    const geometry = new THREE.TorusGeometry(0.7, 0.2, 16, 100);
+    const geometry = new THREE.PlaneBufferGeometry(1, 1.3);
 
-    // Materials
-    const material = new THREE.MeshBasicMaterial();
-    material.color = new THREE.Color(0xff0000);
+    for (let index = 0; index < 5; index++) {
+      const material = new THREE.MeshBasicMaterial({
+        map: textureLoader.load(`./${index}.jpg`),
+      });
 
-    // Mesh
-    const sphere = new THREE.Mesh(geometry, material);
-    scene.add(sphere);
+      const img = new THREE.Mesh(geometry, material);
+      img.position.set(1, index * -1.8, 0);
 
-    // Lights
+      scene.add(img);
+    }
+
+    let objs: any = [];
+    scene.traverse((object: any) => {
+      if (object.isMesh) objs.push(object);
+    });
+
+    console.log(objs);
 
     const pointLight = new THREE.PointLight(0xffffff, 0.1);
     pointLight.position.x = 2;
@@ -35,9 +50,6 @@ export default class HelloWorld extends Vue {
     pointLight.position.z = 4;
     scene.add(pointLight);
 
-    /**
-     * Sizes
-     */
     const sizes = {
       width: window.innerWidth,
       height: window.innerHeight,
@@ -57,10 +69,6 @@ export default class HelloWorld extends Vue {
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     });
 
-    /**
-     * Camera
-     */
-    // Base camera
     const camera = new THREE.PerspectiveCamera(
       75,
       sizes.width / sizes.height,
@@ -72,38 +80,51 @@ export default class HelloWorld extends Vue {
     camera.position.z = 2;
     scene.add(camera);
 
-    // Controls
-    // const controls = new OrbitControls(camera, canvas)
-    // controls.enableDamping = true
-
-    /**
-     * Renderer
-     */
     const renderer = new THREE.WebGLRenderer({
       canvas: canvas,
     });
     renderer.setSize(sizes.width, sizes.height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-    /**
-     * Animate
-     */
+    const mouse = new THREE.Vector2();
+    window.addEventListener("mousemove", (event) => {
+      mouse.x = (event.clientX / sizes.width) * 2 - 1;
+      mouse.y = (event.clientY / sizes.height) * 2 - 1;
+    });
 
-    const clock = new THREE.Clock();
+    // Mouse position
+    let y = 0;
+    let position = 0;
+    window.addEventListener("wheel", (event) => {
+      y = -event.deltaY * 0.0007;
+    });
+
+    const raycaster = new THREE.Raycaster();
 
     const tick = () => {
-      const elapsedTime = clock.getElapsedTime();
+      position += y;
+      y *= 0.9;
 
-      // Update objects
-      sphere.rotation.y = 0.5 * elapsedTime;
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects(objs);
 
-      // Update Orbital Controls
-      // controls.update()
+      for (const intersect of intersects) {
+        gsap.to(intersect.object.scale, { x: 1.7, y: 1.7 });
+        gsap.to(intersect.object.rotation, { y: -0.5 });
+        gsap.to(intersect.object.position, { z: -0.9 });
+      }
 
-      // Render
+      for (const object of objs) {
+        if (!intersects.find((i) => i.object === object)) {
+          gsap.to(object.scale, { x: 1, y: 1 });
+          gsap.to(object.rotation, { y: 0 });
+          gsap.to(object.position, { z: 0 });
+        }
+      }
+
+      camera.position.y = -position;
+
       renderer.render(scene, camera);
-
-      // Call tick again on the next frame
       window.requestAnimationFrame(tick);
     };
 
@@ -118,5 +139,19 @@ export default class HelloWorld extends Vue {
   top: 0;
   left: 0;
   outline: none;
+}
+.content {
+  position: absolute;
+  display: grid;
+  align-items: center;
+  z-index: 1;
+  height: 100%;
+  width: 100%;
+
+  h1 {
+    font-size: 5em;
+    color: white;
+    margin-left: 10vw;
+  }
 }
 </style>
