@@ -6,9 +6,13 @@
 
     <canvas ref="webgl" class="webgl"></canvas>
     <div class="scroll-indication">
-      <p class="animated infinite bounce">--</p>
+      <v-icon dark left class="animated infinite wobble">
+        mdi-arrow-left
+      </v-icon>
       <p>Scroll</p>
-      <p>--></p>
+      <v-icon dark right class="animated infinite wobble">
+        mdi-arrow-right
+      </v-icon>
     </div>
   </div>
 </template>
@@ -201,12 +205,24 @@ export default class HelloWorld extends Vue {
 }
 
 .scroll-indication {
-  border: 1px solid;
-  position: absolute;
-  margin: 0 auto;
-  position: absolute;
-  left: 50%;
-  bottom: 20px;
   display: flex;
+  position: absolute;
+  width: 300px;
+  bottom: 50px;
+  right: 25%;
+  left: 50%;
+  margin-left: -150px;
+  justify-content: center;
+  font-weight: 100;
+
+  p {
+    border: 1px solid;
+    border-radius: 50px;
+    padding: 5px 18px;
+  }
+}
+
+.v-icon.v-icon {
+  font-weight: 100;
 }
 </style>

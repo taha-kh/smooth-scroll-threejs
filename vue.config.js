@@ -1,3 +1,6 @@
 module.exports = {
-  transpileDependencies: ["v-animate-css"],
+  transpileDependencies: [
+    'v-animate-css',
+    'vuetify'
+  ],
 };
