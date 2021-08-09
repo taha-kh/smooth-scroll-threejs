@@ -5,11 +5,6 @@
     </div>
 
     <canvas ref="webgl" class="webgl"></canvas>
-    <div class="scroll-indication">
-      <p class="animated infinite bounce">--</p>
-      <p>Scroll</p>
-      <p>--></p>
-    </div>
   </div>
 </template>
 
@@ -198,15 +193,5 @@ export default class HelloWorld extends Vue {
     text-transform: uppercase;
     font-weight: 200;
   }
-}
-
-.scroll-indication {
-  border: 1px solid;
-  position: absolute;
-  margin: 0 auto;
-  position: absolute;
-  left: 50%;
-  bottom: 20px;
-  display: flex;
 }
 </style>
