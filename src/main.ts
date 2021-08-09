@@ -4,6 +4,7 @@ import router from "./router";
 import store from "./store";
 
 import VAnimateCss from "v-animate-css";
+import vuetify from './plugins/vuetify'
 
 Vue.config.productionTip = false;
 Vue.use(VAnimateCss);
@@ -11,5 +12,6 @@ Vue.use(VAnimateCss);
 new Vue({
   router,
   store,
-  render: (h) => h(App),
+  vuetify,
+  render: (h) => h(App)
 }).$mount("#app");
