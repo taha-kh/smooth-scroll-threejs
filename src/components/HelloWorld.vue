@@ -12,8 +12,7 @@
 import { Component, Vue } from "vue-property-decorator";
 import * as THREE from "three";
 import gsap from "gsap";
-// import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-// import * as dat from "dat.gui";
+import albums from "../models/Discography";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 @Component
@@ -30,65 +29,6 @@ export default class HelloWorld extends Vue {
     height: window.innerHeight,
   };
 
-  albums = [
-    {
-      id: "0",
-      name: "The Piper at the Gates of Dawn",
-    },
-    {
-      id: "1",
-      name: "A Saucerful of Secrets",
-    },
-    {
-      id: "2",
-      name: "More",
-    },
-    {
-      id: "3",
-      name: "Ummagumma",
-    },
-    {
-      id: "4",
-      name: "Atom Heart Mother",
-    },
-    {
-      id: "5",
-      name: "Meddle",
-    },
-    {
-      id: "6",
-      name: "Obscured by Clouds",
-    },
-    {
-      id: "7",
-      name: "The Dark Side of the Moon",
-    },
-    {
-      id: "8",
-      name: "Wish You Were Here",
-    },
-    {
-      id: "9",
-      name: "Animals",
-    },
-    {
-      id: "10",
-      name: "The Wall",
-    },
-    {
-      id: "11",
-      name: "The Final Cut",
-    },
-    {
-      id: "12",
-      name: "A Momentary Lapse of Reason",
-    },
-    {
-      id: "13",
-      name: "The Division Bell",
-    },
-  ];
-
   constructor() {
     super();
     this.textureLoader = new THREE.TextureLoader();
@@ -97,10 +37,11 @@ export default class HelloWorld extends Vue {
 
   mounted(): void {
     this.scene = new THREE.Scene();
-    // this.scene.background = this.textureLoader.load("./sky.jpg");
     this.loadCamera();
     this.loadImage();
     this.renderWebGL();
+
+    window.addEventListener("pointerdown", this.onAlbumClicked);
 
     const mouse = new THREE.Vector2();
     window.addEventListener("mousemove", (event) => {
@@ -113,11 +54,9 @@ export default class HelloWorld extends Vue {
 
     window.addEventListener("wheel", (event) => {
       x = event.deltaY * 0.0007;
-      console.log(x);
     });
 
     const raycaster = new THREE.Raycaster();
-
     const tick = () => {
       position += x;
       x *= 0.9;
@@ -127,9 +66,8 @@ export default class HelloWorld extends Vue {
 
       for (const intersect of intersects) {
         gsap.to(intersect.object.scale, { x: 1.7, y: 1.7 });
-        // gsap.to(intersect.object.rotation, { y: -0.5 });
-        // gsap.to(intersect.object.position, { z: -0.9 });
-        this.albumTitle = this.albums.find(
+
+        this.albumTitle = albums.find(
           (album) => album.id === intersect.object.name
         )?.name;
       }
@@ -137,8 +75,6 @@ export default class HelloWorld extends Vue {
       for (const object of this.getImagesFromScene()) {
         if (!intersects.find((i) => i.object === object)) {
           gsap.to(object.scale, { x: 1, y: 1 });
-          // gsap.to(object.rotation, { y: 0 });
-          // gsap.to(object.position, { z: 0 });
         }
       }
 
@@ -149,6 +85,22 @@ export default class HelloWorld extends Vue {
     };
 
     tick();
+  }
+
+  private onAlbumClicked(event: any): void {
+    const mouse = new THREE.Vector2();
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+    let raycaster = new THREE.Raycaster();
+    raycaster.setFromCamera(mouse, this.camera);
+
+    const intersects = raycaster.intersectObjects(this.getImagesFromScene());
+    for (const intersect of intersects) {
+      this.$router.push({
+        name: albums.find((a) => a.id === intersect.object.name)?.url,
+      });
+    }
   }
 
   private loadCamera(): void {
