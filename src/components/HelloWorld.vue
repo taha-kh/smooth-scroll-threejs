@@ -41,10 +41,10 @@ export default class HelloWorld extends Vue {
     this.loadImage();
     this.renderWebGL();
 
-    window.addEventListener("pointerdown", this.onAlbumClicked);
+    this.$el.addEventListener("pointerdown", this.onAlbumClicked);
 
     const mouse = new THREE.Vector2();
-    window.addEventListener("mousemove", (event) => {
+    this.$el.addEventListener("mousemove", (event: any) => {
       mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
       mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
     });
@@ -52,7 +52,7 @@ export default class HelloWorld extends Vue {
     let x = 0;
     let position = 0;
 
-    window.addEventListener("wheel", (event) => {
+    this.$el.addEventListener("wheel", (event: any) => {
       x = event.deltaY * 0.0007;
     });
 
@@ -100,6 +100,8 @@ export default class HelloWorld extends Vue {
       this.$router.push({
         name: albums.find((a) => a.id === intersect.object.name)?.url,
       });
+
+      event.stopPropagation();
     }
   }
 
