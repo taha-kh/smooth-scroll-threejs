@@ -1,6 +1,9 @@
 <template>
   <div id="app">
-    <transition name="fade" mode="out-in">
+    <transition
+      enter-active-class="animated fadeInDownBig"
+      leave-active-class="animated fadeOutDownBig"
+    >
       <router-view />
     </transition>
   </div>
@@ -17,15 +20,8 @@ body {
   height: 100vh;
   font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI",
     Roboto, "Helvetica Neue", Arial, sans-serif;
-}
-
-.fade-enter,
-.fade-leave-to {
-  transition: translateX(3em);
-  opacity: 0;
-}
-.fade-enter-active,
-.fade-leave-active {
-  transition: all 0.3s ease;
+  overflow: hidden;
+  background-color: black;
+  color: white;
 }
 </style>

@@ -2,7 +2,7 @@ export const albums = [
   {
     id: "0",
     name: "The Piper at the Gates of Dawn",
-    url: "",
+    url: "ThePiperAtTheGatesOfDawn",
   },
   {
     id: "1",

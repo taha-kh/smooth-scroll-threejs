@@ -1,6 +1,6 @@
 <template>
-  <div class="theDarkSideOfTheMoon">
-    TheDarkSideOfTheMoon Yesss !!!!
+  <div class="thePiperAtTheGatesOfDawn">
+    ThePiperAtTheGatesOfDawn Yesss !!!!
   </div>
 </template>
 
@@ -10,10 +10,10 @@ import { Component, Vue } from "vue-property-decorator";
 @Component({
   components: {},
 })
-export default class TheDarkSideOfTheMoon extends Vue {}
+export default class ThePiperAtTheGatesOfDawn extends Vue {}
 </script>
 <style lang="scss" scoped>
-.theDarkSideOfTheMoon {
+.thePiperAtTheGatesOfDawn {
   position: fixed;
   padding: 0;
   margin: 0;
@@ -21,6 +21,6 @@ export default class TheDarkSideOfTheMoon extends Vue {}
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: purple;
+  background-color: #fce5cd;
 }
 </style>
