@@ -1,7 +1,11 @@
 <template>
   <div>
     <div class="content">
+      <p>PINK FLOYD.</p>
       <h1>{{ albumTitle }}</h1>
+      <v-icon dark>
+        mdi-menu
+      </v-icon>
     </div>
 
     <canvas ref="webgl" class="webgl"></canvas>
@@ -30,6 +34,7 @@ export default class HelloWorld extends Vue {
   camera!: THREE.PerspectiveCamera;
   renderer!: THREE.WebGLRenderer;
   textureLoader: THREE.TextureLoader;
+  background!: THREE.Mesh;
 
   albumTitle: string | undefined;
 
@@ -44,9 +49,11 @@ export default class HelloWorld extends Vue {
     this.albumTitle = "";
   }
 
-  mounted(): void {
+  async mounted(): Promise<void> {
     this.scene = new THREE.Scene();
+    this.scene.background = new THREE.Color("#202124");
     this.loadCamera();
+    //await this.loadBackground();
     this.loadImage();
     this.renderWebGL();
 
@@ -94,6 +101,22 @@ export default class HelloWorld extends Vue {
     };
 
     tick();
+  }
+
+  async loadBackground(): Promise<void> {
+    const geometry = new THREE.PlaneGeometry(100, 10);
+    const texture = await this.textureLoader.load("./starry.jpg");
+    texture.repeat.set(16, 16);
+    texture.wrapS = THREE.RepeatWrapping;
+    texture.wrapT = THREE.RepeatWrapping;
+    this.background = new THREE.Mesh(
+      geometry,
+      new THREE.MeshBasicMaterial({
+        map: texture,
+      })
+    );
+
+    this.scene.add(this.background);
   }
 
   private onAlbumClicked(event: any): void {
@@ -190,17 +213,29 @@ export default class HelloWorld extends Vue {
 }
 .content {
   position: absolute;
-  display: grid;
+  display: flex;
   align-items: center;
   z-index: 1;
   width: 100%;
+  height: 66px;
   text-align: center;
+  margin-top: 5px;
+  padding: 0px 25px;
+  justify-content: space-between;
 
   h1 {
-    font-size: 3em;
+    font-size: 2em;
     color: white;
     text-transform: uppercase;
     font-weight: 200;
+    letter-spacing: 4px;
+    width: 400px;
+    margin-left: -110px;
+  }
+
+  p {
+    font-weight: 900;
+    letter-spacing: 4px;
   }
 }
 

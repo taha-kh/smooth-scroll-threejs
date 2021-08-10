@@ -10,6 +10,7 @@
 </template>
 
 <style lang="scss">
+@import url("https://fonts.googleapis.com/css2?family=Flamenco:wght@300&display=swap");
 * {
   margin: 0;
   padding: 0;
@@ -18,8 +19,7 @@
 html,
 body {
   height: 100vh;
-  font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI",
-    Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: "Flamenco", cursive;
   overflow: hidden;
   background-color: black;
   color: white;
