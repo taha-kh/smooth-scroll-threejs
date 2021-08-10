@@ -86,6 +86,7 @@ export default class TheDarkSideOfTheMoon extends Vue {
     this.renderWebGL();
 
     const axesHelper = new THREE.AxesHelper(5);
+    axesHelper.visible = false;
     this.scene.add(axesHelper);
 
     const controls = new OrbitControls(this.camera, this.renderer.domElement);
