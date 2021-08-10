@@ -23,5 +23,6 @@ body {
   overflow: hidden;
   background-color: black;
   color: white;
+  cursor: url("/triangle.svg"), auto;
 }
 </style>
